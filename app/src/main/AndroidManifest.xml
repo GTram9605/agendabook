@@ -10,6 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".features.FeaturesActivity"
+            android:label="@string/title_activity_features"
+            android:theme="@style/MaterialAppTheme"></activity>
+        <activity
             android:name=".MainActivity"
             android:theme="@style/AppThemeWithoutActionBar">
             <intent-filter>
@@ -18,6 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

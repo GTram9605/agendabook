@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Agenda book</string>
     <string name="start">Start</string>
+    <string name="title_activity_features">MainActivity</string>
+    <string name="title_tasks">Tasks</string>
+    <string name="title_progress">Progress</string>
+    <string name="title_mark_complete">Mark completed</string>
+    <string name="add_task">Add task</string>
+    <string name="title">Title:</string>
+    <string name="description">Description</string>
+    <string name="date">Due date</string>
+    <string name="cancel">Cancel</string>
+    <string name="date_hint">DD/MM/YYYY</string>
 </resources>
