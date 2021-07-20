@@ -1,7 +1,12 @@
 package za.ac.nplinnovations.agendabook.features;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -20,6 +25,8 @@ import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.lang.ref.WeakReference;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -27,6 +34,7 @@ import java.util.Locale;
 import za.ac.nplinnovations.agendabook.R;
 import za.ac.nplinnovations.agendabook.database.doa.AppDatabase;
 import za.ac.nplinnovations.agendabook.database.entities.Task;
+import za.ac.nplinnovations.agendabook.notifcations.AlertReceiver2;
 
 public class FeaturesActivity extends AppCompatActivity {
 
@@ -110,12 +118,7 @@ public class FeaturesActivity extends AppCompatActivity {
     }
 
     private void addNewTaskToCalender(Task task) {
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "agendabook_db").allowMainThreadQueries().build();
-
-        db.taskDao().insertAll(task);
-
-        Toast.makeText(FeaturesActivity.this, "Task added successfully.", Toast.LENGTH_SHORT).show();
+        new AddTaskAsync(getBaseContext(), task).execute();
     }
 
     private boolean fieldsAreValid(EditText etTitle, EditText etDescription, EditText etDate) {
@@ -134,5 +137,44 @@ public class FeaturesActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    private class AddTaskAsync extends AsyncTask<Void, Void, Task> {
+        private WeakReference<Context> weakReference;
+        private Task task;
+
+
+        public AddTaskAsync(Context activity, Task task) {
+            this.weakReference = new WeakReference<>(activity);
+            this.task = task;
+        }
+
+        @Override
+        protected Task doInBackground(Void... voids) {
+            AppDatabase db = Room.databaseBuilder(weakReference.get(),
+                    AppDatabase.class, "agendabook_db").build();
+
+            db.taskDao().insertAll(task);
+
+            return task;
+        }
+
+        @Override
+        protected void onPostExecute(Task task) {
+            Toast.makeText(weakReference.get(), "Task added successfully.", Toast.LENGTH_SHORT).show();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            long appointmentInMilliseconds = 0;
+            try {
+                appointmentInMilliseconds = sdf.parse(task.getDue_date() + " 15:04:30").getTime();
+                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                Intent intent = new Intent(weakReference.get(), AlertReceiver2.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(weakReference.get(), 5, intent, 0);
+
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, appointmentInMilliseconds, pendingIntent);
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, appointmentInMilliseconds, AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -25,10 +25,7 @@ public interface TaskDOA {
     void insertAll(Task... tasks);
 
     @Update
-    void markAsCompleted(Task task);
-
-    @Update
-    void editTask(Task task);
+    void markAsCompleted(Task... tasks);
 
     @Delete
     void delete(Task task);
