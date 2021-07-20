@@ -1,0 +1,138 @@
+package za.ac.nplinnovations.agendabook.features;
+
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.os.Bundle;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import androidx.room.Room;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
+import za.ac.nplinnovations.agendabook.R;
+import za.ac.nplinnovations.agendabook.database.doa.AppDatabase;
+import za.ac.nplinnovations.agendabook.database.entities.Task;
+
+public class FeaturesActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_features);
+
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
+    }
+
+    public void onClickAddTask(final View view) {
+        final Dialog dialog = new Dialog(view.getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.add_new_task);
+
+        Button btnAdd = dialog.findViewById(R.id.btnAdd),
+                cancleButton = dialog.findViewById(R.id.btnCancel);
+        final EditText etTitle = dialog.findViewById(R.id.etTitle),
+                etDescription = dialog.findViewById(R.id.etDescription),
+                etDate = dialog.findViewById(R.id.etDate);
+
+        final ImageView ivDteCalender = dialog.findViewById(R.id.ivDteCalender);
+
+        final Calendar myCalendar = Calendar.getInstance();
+        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                String myFormat = "dd/MM/YYYY"; // your format
+                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
+
+                etDate.setText(sdf.format(myCalendar.getTime()));
+            }
+
+        };
+
+        ivDteCalender.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(v.getContext(), date,
+                        myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (fieldsAreValid(etTitle, etDescription, etDate)) {
+                    addNewTaskToCalender(new Task(etTitle.getText().toString(),
+                            etDescription.getText().toString(),
+                            etDate.getText().toString()));
+                    dialog.dismiss();
+                }
+            }
+        });
+        cancleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void addNewTaskToCalender(Task task) {
+        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "agendabook_db").allowMainThreadQueries().build();
+
+        db.taskDao().insertAll(task);
+
+        Toast.makeText(FeaturesActivity.this, "Task added successfully.", Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean fieldsAreValid(EditText etTitle, EditText etDescription, EditText etDate) {
+        if (etTitle.getText().toString() == null ||
+                etTitle.getText().toString().length() < 3) {
+            etTitle.setError("Input valid title, 3 characters min.");
+        } else if (etDescription.getText().toString() == null ||
+                etDescription.getText().toString().length() < 3) {
+            etDescription.setError("Input valid description.");
+        } else if (etDate.getText().toString() == null ||
+                etDate.getText().toString().length() < 3
+                || !etDate.getText().toString().contains("/")) {
+            etDate.setError("Input valid date.");
+        } else {
+            return true;
+        }
+
+        return false;
+    }
+}
