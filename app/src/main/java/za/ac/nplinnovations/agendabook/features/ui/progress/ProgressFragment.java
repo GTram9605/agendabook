@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import za.ac.nplinnovations.agendabook.R;
 
-
 public class ProgressFragment extends Fragment {
 
     private ProgressViewModel progressViewModel;

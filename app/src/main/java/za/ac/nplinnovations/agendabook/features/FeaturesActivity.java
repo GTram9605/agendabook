@@ -1,7 +1,11 @@
 package za.ac.nplinnovations.agendabook.features;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -20,6 +24,7 @@ import androidx.room.Room;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -27,6 +32,7 @@ import java.util.Locale;
 import za.ac.nplinnovations.agendabook.R;
 import za.ac.nplinnovations.agendabook.database.doa.AppDatabase;
 import za.ac.nplinnovations.agendabook.database.entities.Task;
+import za.ac.nplinnovations.agendabook.notifcations.AlertReceiver2;
 
 public class FeaturesActivity extends AppCompatActivity {
 
@@ -116,6 +122,20 @@ public class FeaturesActivity extends AppCompatActivity {
         db.taskDao().insertAll(task);
 
         Toast.makeText(FeaturesActivity.this, "Task added successfully.", Toast.LENGTH_SHORT).show();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        long appointmentInMilliseconds = 0;
+        try {
+            appointmentInMilliseconds = sdf.parse(task.getDue_date() + " 15:04:30").getTime();
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(this, AlertReceiver2.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 5, intent, 0);
+
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, appointmentInMilliseconds, pendingIntent);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, appointmentInMilliseconds, AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private boolean fieldsAreValid(EditText etTitle, EditText etDescription, EditText etDate) {
