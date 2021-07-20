@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,6 +33,40 @@ public class ProgressFragment extends Fragment {
                 textView.setText(s);
             }
         });
+
+        final ProgressBar pbComplete = root.findViewById(R.id.pbComplete),
+                pbIncomplete = root.findViewById(R.id.pbIncomplete),
+                pbTotal = root.findViewById(R.id.pbTotal);
+
+        final TableLayout tblProgress = root.findViewById(R.id.tblProgress);
+
+        if (progressViewModel.getTasks(getContext()).getValue().size() > 0) {
+            textView.setVisibility(View.GONE);
+            tblProgress.setVisibility(View.VISIBLE);
+
+            int countComplete = 0;
+            int countIncomplete = 0;
+            int total = 0;
+
+            for (int i = 0; i < progressViewModel.getTasks(getContext()).getValue().size(); i++) {
+                if (progressViewModel.getTasks(getContext()).getValue().get(i).isComplete)
+                    countComplete++;
+                else
+                    countIncomplete++;
+
+                total++;
+            }
+
+            pbTotal.setProgress(((total / total) * 100), true);
+            pbComplete.setProgress(((countComplete / total) * 100), true);
+            pbIncomplete.setProgress(((countIncomplete / total) * 100), true);
+
+        } else {
+            tblProgress.setVisibility(View.GONE);
+            textView.setVisibility(View.VISIBLE);
+        }
+
         return root;
     }
+
 }

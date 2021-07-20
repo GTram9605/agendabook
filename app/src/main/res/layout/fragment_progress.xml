@@ -6,6 +6,68 @@
     android:layout_height="match_parent"
     tools:context=".features.ui.progress.ProgressFragment">
 
+    <TableLayout
+        android:id="@+id/tblProgress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:stretchColumns="1">
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/completed"
+                android:textAppearance="?android:textAppearanceMedium" />
+
+            <ProgressBar
+                android:id="@+id/pbComplete"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/fab_button_padding"
+                android:layout_weight="2" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/incompleted"
+                android:textAppearance="?android:textAppearanceMedium" />
+
+            <ProgressBar
+                android:id="@+id/pbIncomplete"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/fab_button_padding"
+                android:layout_weight="2" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/total"
+                android:textAppearance="?android:textAppearanceMedium" />
+
+            <ProgressBar
+                android:id="@+id/pbTotal"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/fab_button_padding"
+                android:layout_weight="2" />
+        </TableRow>
+    </TableLayout>
+
     <TextView
         android:id="@+id/text_dashboard"
         android:layout_width="match_parent"
@@ -14,6 +76,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:textAlignment="center"
+        android:visibility="gone"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -1,15 +1,19 @@
 package za.ac.nplinnovations.agendabook.adapters;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import za.ac.nplinnovations.agendabook.R;
@@ -57,18 +61,40 @@ public class IncompleteTaskAdapter extends RecyclerView.Adapter<IncompleteTaskAd
             tvDueDate = itemView.findViewById(R.id.tvDate);
             tvDescription = itemView.findViewById(R.id.tvDescription);
 
-
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             Task task = mData.getValue().get(getAdapterPosition());
-            AppDatabase db = Room.databaseBuilder(mInflater.getContext(),
-                    AppDatabase.class, "agendabook_db").allowMainThreadQueries().build();
-            db.taskDao().editTask(task);
+            new MarkTaskCompleteAsync(mInflater.getContext(), task).execute();
+        }
+    }
 
-            notifyDataSetChanged();
+    private static class MarkTaskCompleteAsync extends AsyncTask<Void, Void, Task> {
+        private WeakReference<Context> weakReference;
+        private Task task;
+
+
+        public MarkTaskCompleteAsync(Context activity, Task task) {
+            this.weakReference = new WeakReference<>(activity);
+            this.task = task;
+        }
+
+        @Override
+        protected Task doInBackground(Void... voids) {
+            AppDatabase db = Room.databaseBuilder(weakReference.get(),
+                    AppDatabase.class, "agendabook_db").build();
+
+            db.taskDao().markAsCompleted(task);
+
+            return task;
+        }
+
+        @Override
+        protected void onPostExecute(Task task) {
+            Toast.makeText(weakReference.get(), task.getTitle() + " marked as complete.",
+                    Toast.LENGTH_LONG).show();
         }
     }
 }
