@@ -35,6 +35,15 @@ public class MarkCompletedFragment extends Fragment {
 
         final RecyclerView recycler = root.findViewById(R.id.recyclerTasks);
         recycler.setAdapter(new IncompleteTaskAdapter(markCompletedViewModel.getTasks(getContext()), getLayoutInflater()));
+
+        if (markCompletedViewModel.getTasks(getContext()).getValue().size() > 0) {
+            textView.setVisibility(View.GONE);
+            recycler.setVisibility(View.VISIBLE);
+        } else {
+            recycler.setVisibility(View.GONE);
+            textView.setVisibility(View.VISIBLE);
+        }
+
         return root;
     }
 }

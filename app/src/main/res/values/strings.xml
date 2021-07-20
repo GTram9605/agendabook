@@ -5,10 +5,11 @@
     <string name="title_tasks">Tasks</string>
     <string name="title_progress">Progress</string>
     <string name="title_mark_complete">Mark completed</string>
+    <string name="mark_complete">Mark\ncompleted</string>
     <string name="add_task">Add task</string>
     <string name="title">Title:</string>
-    <string name="description">Description</string>
-    <string name="date">Due date</string>
+    <string name="description">Description:</string>
+    <string name="date">Due date:</string>
     <string name="cancel">Cancel</string>
     <string name="date_hint">DD/MM/YYYY</string>
 </resources>
